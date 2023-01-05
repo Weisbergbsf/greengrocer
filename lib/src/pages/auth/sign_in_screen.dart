@@ -1,10 +1,10 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:get/route_manager.dart';
+import 'package:greengrocer/src/config/custom_colors.dart';
 import 'package:greengrocer/src/pages/common_widgets/app_name_widget.dart';
 import 'package:greengrocer/src/pages/common_widgets/custom_text_field.dart';
-import 'package:greengrocer/src/pages/auth/sign_up_screen.dart';
-import 'package:greengrocer/src/pages/base/base_screen.dart';
-import 'package:greengrocer/src/config/custom_colors.dart';
+import 'package:greengrocer/src/pages_routes/app_pages.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -77,9 +77,12 @@ class SignInScreen extends StatelessWidget {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: ((context) => const BaseScreen())));
+                          /* Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: ((context) => const BaseScreen()),
+                            ),
+                          ); */
+                          Get.offNamed(PagesRoutes.baseRoute);
                         },
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -131,8 +134,12 @@ class SignInScreen extends StatelessWidget {
                       height: 50,
                       child: OutlinedButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: ((context) => SignUpScreen())));
+                          /* Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: ((context) => SignUpScreen()),
+                            ),
+                          ); */
+                          Get.toNamed(PagesRoutes.signUpRoute);
                         },
                         style: OutlinedButton.styleFrom(
                             shape: RoundedRectangleBorder(

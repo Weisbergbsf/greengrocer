@@ -2,7 +2,7 @@ import 'package:add_to_cart_animation/add_to_cart_animation.dart';
 import 'package:add_to_cart_animation/add_to_cart_icon.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:get/get.dart';
 import 'package:greengrocer/src/config/custom_colors.dart';
 import 'package:greengrocer/src/pages/common_widgets/app_name_widget.dart';
 import 'package:greengrocer/src/pages/common_widgets/custom_shimmer.dart';
@@ -21,13 +21,10 @@ class _HomeTabState extends State<HomeTab> {
   GlobalKey<CartIconKey> globalKeyCartItems = GlobalKey<CartIconKey>();
   late Function(GlobalKey) runAddToCartAnimation;
 
+  final searchController = TextEditingController();
+
   void itemSelectedCartAnimations(GlobalKey gkImage) {
     runAddToCartAnimation(gkImage);
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -73,34 +70,53 @@ class _HomeTabState extends State<HomeTab> {
         },
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  isDense: true,
-                  hintText: 'Pesquise aqui...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
-                    fontSize: 14,
+            GetBuilder<HomeController>(
+              builder: (controller) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
                   ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: CustomColors.customContrastColor,
-                    size: 21,
+                  child: TextFormField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      controller.searchTitle.value = value;
+                    },
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      isDense: true,
+                      hintText: 'Pesquise aqui...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade400,
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: CustomColors.customContrastColor,
+                        size: 21,
+                      ),
+                      suffixIcon: controller.searchTitle.value.isNotEmpty
+                          ? IconButton(
+                              onPressed: () {
+                                searchController.clear();
+                                controller.searchTitle.value = '';
+                                FocusScope.of(context).unfocus();
+                              },
+                              icon: const Icon(Icons.close),
+                              color: CustomColors.customContrastColor,
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(60),
+                          borderSide: const BorderSide(
+                            width: 0,
+                            style: BorderStyle.none,
+                          )),
+                    ),
                   ),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(60),
-                      borderSide: const BorderSide(
-                        width: 0,
-                        style: BorderStyle.none,
-                      )),
-                ),
-              ),
+                );
+              },
             ),
             // Categoria
             GetBuilder<HomeController>(builder: (controller) {
@@ -147,29 +163,45 @@ class _HomeTabState extends State<HomeTab> {
             GetBuilder<HomeController>(builder: (controller) {
               return Expanded(
                 child: !controller.isProductLoading
-                    ? GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        physics: const BouncingScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          childAspectRatio:
-                              9 / 11.5, // Aumenta a altura do item do grid
+                    ? Visibility(
+                        visible: (controller.currentCategory?.items ?? [])
+                            .isNotEmpty,
+                        replacement: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off,
+                              size: 40,
+                              color: CustomColors.customSwatchColor,
+                            ),
+                            const Text('Náo há items para apresentar'),
+                          ],
                         ),
-                        itemCount: controller.allProducts.length,
-                        itemBuilder: (_, index) {
-                          if (((index + 1) == controller.allProducts.length) &&
-                              !controller.isLastPage) {
-                            controller.loadMoreProducts();
-                          }
+                        child: GridView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          physics: const BouncingScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                            childAspectRatio:
+                                9 / 11.5, // Aumenta a altura do item do grid
+                          ),
+                          itemCount: controller.allProducts.length,
+                          itemBuilder: (_, index) {
+                            if (((index + 1) ==
+                                    controller.allProducts.length) &&
+                                !controller.isLastPage) {
+                              controller.loadMoreProducts();
+                            }
 
-                          return ItemTile(
-                            item: controller.allProducts[index],
-                            cartAnimationMethod: itemSelectedCartAnimations,
-                          );
-                        },
+                            return ItemTile(
+                              item: controller.allProducts[index],
+                              cartAnimationMethod: itemSelectedCartAnimations,
+                            );
+                          },
+                        ),
                       )
                     : GridView.count(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

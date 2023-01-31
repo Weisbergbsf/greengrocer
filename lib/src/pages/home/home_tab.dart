@@ -4,6 +4,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:greengrocer/src/config/custom_colors.dart';
+import 'package:greengrocer/src/pages/cart/controller/cart_controller.dart';
 import 'package:greengrocer/src/pages/common_widgets/app_name_widget.dart';
 import 'package:greengrocer/src/pages/common_widgets/custom_shimmer.dart';
 import 'package:greengrocer/src/pages/home/controller/home_controller.dart';
@@ -22,6 +23,7 @@ class _HomeTabState extends State<HomeTab> {
   late Function(GlobalKey) runAddToCartAnimation;
 
   final searchController = TextEditingController();
+  final controller = Get.find<CartController>();
 
   void itemSelectedCartAnimations(GlobalKey gkImage) {
     runAddToCartAnimation(gkImage);
@@ -42,9 +44,9 @@ class _HomeTabState extends State<HomeTab> {
               onTap: () {},
               child: Badge(
                 badgeColor: CustomColors.customContrastColor,
-                badgeContent: const Text(
-                  '2',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                badgeContent: Text(
+                  controller.getCartTotalItems().toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
                 child: AddToCartIcon(
                   key: globalKeyCartItems,

@@ -26,7 +26,7 @@ class OrderTile extends StatelessWidget {
             children: [
               Text('Pedido ${order.id}'),
               Text(
-                utils.formatDateTime(order.createdDateTime),
+                utils.formatDateTime(order.createdDateTime!),
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.black,
@@ -65,7 +65,7 @@ class OrderTile extends StatelessWidget {
                     flex: 2,
                     child: OrderStatusWidget(
                       status: order.status,
-                      isOverdue: order.overdueDateTime.isBefore(DateTime.now()),
+                      isOverdue: order.due.isBefore(DateTime.now()),
                     ),
                   ),
                 ],

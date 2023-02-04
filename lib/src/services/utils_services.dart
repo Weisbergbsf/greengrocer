@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -31,6 +34,12 @@ class UtilsServices {
 
     DateFormat dateFormat = DateFormat.yMd('pt_BR').add_Hm();
     return dateFormat.format(dateTime);
+  }
+
+  Uint8List decoreQrCodeImage(String value) {
+    String base64String = value.split(',').last;
+
+    return base64.decode(base64String);
   }
 
   void showToast({required String message, bool isError = false}) {

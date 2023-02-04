@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:greengrocer/src/config/app_data.dart' as app_data;
 import 'package:greengrocer/src/config/custom_colors.dart';
 import 'package:greengrocer/src/pages/cart/controller/cart_controller.dart';
 import 'package:greengrocer/src/pages/cart/view/components/cart_tile.dart';
-import 'package:greengrocer/src/pages/common_widgets/payment_dialog.dart';
 import 'package:greengrocer/src/services/utils_services.dart';
 
 class CartTab extends StatefulWidget {
@@ -16,6 +14,8 @@ class CartTab extends StatefulWidget {
 
 class _CartTabState extends State<CartTab> {
   final UtilsServices utils = UtilsServices();
+
+  final cartController = Get.find<CartController>();
 
   @override
   Widget build(BuildContext context) {
@@ -95,31 +95,34 @@ class _CartTabState extends State<CartTab> {
                 ),
                 SizedBox(
                   height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CustomColors.customSwatchColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                    onPressed: () async {
-                      bool? result = await showOrderConfirmation();
-                      if (result ?? false) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => PaymentDialog(
-                            order: app_data.orders.first,
+                  child: GetBuilder<CartController>(
+                    builder: (controller) {
+                      return ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomColors.customSwatchColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
                           ),
-                        );
-                      } else {
-                        utils.showToast(
-                            message: 'Pedido não confirmado', isError: true);
-                      }
+                        ),
+                        onPressed: controller.isCheckoutLoading
+                            ? null
+                            : () async {
+                                bool? result = await showOrderConfirmation();
+                                if (result ?? false) {
+                                  cartController.checkoutCart();
+                                } else {
+                                  utils.showToast(
+                                      message: 'Pedido não confirmado');
+                                }
+                              },
+                        child: controller.isCheckoutLoading
+                            ? const CircularProgressIndicator()
+                            : const Text(
+                                'Concluir pedido',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                      );
                     },
-                    child: const Text(
-                      'Concluir pedido',
-                      style: TextStyle(fontSize: 18),
-                    ),
                   ),
                 )
               ],

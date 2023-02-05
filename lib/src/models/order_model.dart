@@ -5,7 +5,7 @@ import 'package:greengrocer/src/models/cart_item_model.dart';
 
 class OrderModel {
   String id;
-  DateTime? createdDateTime;
+  DateTime? createdAt;
   DateTime due; // Usar pra vê se o QRCode venceu
   @JsonKey(defaultValue: [])
   List<CartItemModel> items;
@@ -14,9 +14,11 @@ class OrderModel {
   String qrCodeImage;
   double total;
 
+  bool get isOverDue => due.isBefore(DateTime.now());
+
   OrderModel({
     required this.id,
-    this.createdDateTime,
+    this.createdAt,
     required this.due,
     required this.items,
     required this.status,
@@ -29,9 +31,8 @@ class OrderModel {
     final result = <String, dynamic>{};
 
     result.addAll({'id': id});
-    if (createdDateTime != null) {
-      result
-          .addAll({'createdDateTime': createdDateTime!.millisecondsSinceEpoch});
+    if (createdAt != null) {
+      result.addAll({'createdAt': createdAt!.millisecondsSinceEpoch});
     }
     result.addAll({'due': due.millisecondsSinceEpoch});
     result.addAll({'items': items.map((x) => x.toMap()).toList()});
@@ -46,8 +47,8 @@ class OrderModel {
   factory OrderModel.fromMap(Map<String, dynamic> map) {
     return OrderModel(
       id: map['id'] ?? '',
-      createdDateTime: map['createdDateTime'] != null
-          ? DateTime.parse(map['createdDateTime'] as String)
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['createdAt'] as String)
           : null,
       due: DateTime.parse(map['due'] as String),
       items: (map['result'] as List<dynamic>?)
@@ -70,6 +71,6 @@ class OrderModel {
 
   @override
   String toString() {
-    return 'OrderModel(id: $id, createdDateTime: $createdDateTime, due: $due, items: $items, status: $status, copiaecola: $copiaecola, qrCodeImage: $qrCodeImage, total: $total)';
+    return 'OrderModel(id: $id, createdAt: $createdAt, due: $due, items: $items, status: $status, copiaecola: $copiaecola, qrCodeImage: $qrCodeImage, total: $total)';
   }
 }

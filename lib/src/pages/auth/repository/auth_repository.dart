@@ -57,4 +57,26 @@ class AuthRepository {
         method: HttpMethods.post,
         body: {'email': email});
   }
+
+  Future<bool> changePassword({
+    required String token,
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final result = await _httpManager.restRequest(
+      url: Endpoints.changePassword,
+      method: HttpMethods.post,
+      headers: {
+        'X-Parse-Session-Token': token,
+      },
+      body: {
+        'email': email,
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      },
+    );
+
+    return result['error'] == null;
+  }
 }
